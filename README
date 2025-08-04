@@ -1,0 +1,61 @@
+# HMZ IoT LED Controller (ESP32)
+
+This project is an IoT LED controller based on the ESP32-S3, designed for addressable LEDs such as WS2812B and SK6812. It provides wireless control and configuration via BLE and stores device/network settings in SPIFFS.
+
+## Features
+
+- **Addressable LED Control:** Supports WS2812B, SK6812, and similar LEDs.
+- **BLE Communication:** Acts as a BLE peripheral for phone app control.
+- **Config Storage:** Device and network configuration stored in SPIFFS as JSON.
+- **Dynamic MAC Address:** Automatically detects and stores device MAC.
+- **LED Themes:** Supports solid color, rainbow, breathe, theater chase, and color wipe animations.
+- **Runtime Adjustments:** Change brightness, speed, and animation via BLE commands.
+- **WiFi Config Sync:** Store multiple WiFi credentials for future OTA/cloud features.
+
+## File Structure
+
+- `src/` - Main application code
+- `lib/` - Modular libraries (BLE, device config, LED controller, etc.)
+- `platformio.ini` - PlatformIO build configuration
+- `README` - Project description
+
+## Getting Started
+
+1. **Hardware:** ESP32-S3 board, addressable LED strip (WS2812B/SK6812), optional sensors.
+2. **Software:** PlatformIO, Arduino framework.
+3. **Build & Upload:** Use PlatformIO to build and upload firmware.
+4. **BLE App:** Connect via a BLE app to send commands and configure devices.
+
+## Example JSON Configuration
+
+```json
+{
+  "devices": [
+    {
+      "device_name": "LEDStrip1",
+      "device_type": "strip",
+      "led_type": "WS2812B",
+      "num_of_leds": 30,
+      "mac_address": "00:11:22:33:44:55"
+    }
+  ],
+  "networks": [
+    {
+      "ssid": "HomeNetwork",
+      "password": "password123"
+    }
+  ]
+}
+```
+
+## Future Plans
+
+- OTA updates via WiFi
+- Web dashboard for configuration
+- MQTT integration
+- Time-based LED themes
+
+## License
+
+MIT License
+
