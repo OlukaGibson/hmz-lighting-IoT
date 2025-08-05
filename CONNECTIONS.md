@@ -59,11 +59,11 @@ Phone App                    ESP32 Controller
 ---------                    -----------------
     |                               |
     |  1. Connect via BLE          |
-    |----------------------------->|
+    |-----------------------------> |
     |                               |
     |  2. Request device info       |
     |  {"command":"get_device_info"}|
-    |----------------------------->|
+    |-----------------------------> |
     |                               |
     |  3. Send device info          |
     |  {device_name, led_type, etc} |
@@ -71,7 +71,7 @@ Phone App                    ESP32 Controller
     |                               |
     |  4. Send new device config    |
     |  {device_name, led_type, etc} |
-    |----------------------------->|
+    |-----------------------------> |
     |                               |
     |  5. Save to SPIFFS            |
     |                               |-----> [SPIFFS]
