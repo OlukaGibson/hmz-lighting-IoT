@@ -16,6 +16,10 @@ private:
 public:
     bool begin();
     bool initializeDefaultData();
+    bool interactiveSetup();
+    bool editDeviceConfig();
+    bool editNetworkConfig();
+    bool clearDataWithConfirmation();
     String getDeviceMacAddress();
     bool addDevice(const String& deviceName, const String& deviceType, 
                    const String& ledType, int numLeds, const String& macAddress);

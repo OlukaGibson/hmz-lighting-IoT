@@ -28,6 +28,8 @@ void setup() {
     Serial.begin(115200);
     while (!Serial) delay(10);
 
+    Serial.println("\n=== HMZ IoT LED Controller Starting ===");
+    
     // Initialize SPIFFS and config storage
     if (!storage.begin()) {
         Serial.println("Storage initialization failed!");
@@ -36,6 +38,27 @@ void setup() {
 
     // Show SPIFFS info
     storage.getStorageInfo();
+    
+    // Interactive setup option
+    Serial.println("\nPress 's' within 5 seconds to enter setup mode...");
+    unsigned long startTime = millis();
+    bool enterSetup = false;
+    
+    while (millis() - startTime < 5000) {
+        if (Serial.available()) {
+            char input = Serial.read();
+            if (input == 's' || input == 'S') {
+                enterSetup = true;
+                break;
+            }
+        }
+        delay(100);
+    }
+    
+    if (enterSetup) {
+        storage.interactiveSetup();
+    }
+    
     Serial.println("Current configuration:");
     Serial.println(storage.getAllData());
 

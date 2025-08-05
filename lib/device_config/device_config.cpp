@@ -333,3 +333,163 @@ bool PersistentStorage::formatSPIFFS() {
     Serial.println("SPIFFS format failed");
     return false;
 }
+
+bool PersistentStorage::interactiveSetup() {
+    Serial.println("\n=== HMZ LED Controller Setup ===");
+    Serial.println("1. Edit device configuration");
+    Serial.println("2. Edit network configuration");
+    Serial.println("3. Clear all data (with confirmation)");
+    Serial.println("4. Continue with current settings");
+    Serial.println("5. Show current configuration");
+    Serial.print("Select option (1-5): ");
+    
+    while (!Serial.available()) {
+        delay(100);
+    }
+    
+    String input = Serial.readStringUntil('\n');
+    input.trim();
+    int choice = input.toInt();
+    
+    switch (choice) {
+        case 1:
+            return editDeviceConfig();
+        case 2:
+            return editNetworkConfig();
+        case 3:
+            return clearDataWithConfirmation();
+        case 4:
+            Serial.println("Continuing with current settings...");
+            return true;
+        case 5:
+            Serial.println("\nCurrent configuration:");
+            Serial.println(getAllData());
+            return interactiveSetup(); // Show menu again
+        default:
+            Serial.println("Invalid option. Please try again.");
+            return interactiveSetup();
+    }
+}
+
+bool PersistentStorage::editDeviceConfig() {
+    Serial.println("\n=== Edit Device Configuration ===");
+    
+    String deviceName;
+    Serial.print("Device name [LEDStrip1]: ");
+    while (!Serial.available()) delay(100);
+    deviceName = Serial.readStringUntil('\n');
+    deviceName.trim();
+    if (deviceName.length() == 0) deviceName = "LEDStrip1";
+    
+    String deviceType;
+    Serial.print("Device type (strip/bar/ring/matrix) [strip]: ");
+    while (!Serial.available()) delay(100);
+    deviceType = Serial.readStringUntil('\n');
+    deviceType.trim();
+    if (deviceType.length() == 0) deviceType = "strip";
+    
+    String ledType;
+    Serial.print("LED type (WS2812B/SK6812/WS2811) [WS2812B]: ");
+    while (!Serial.available()) delay(100);
+    ledType = Serial.readStringUntil('\n');
+    ledType.trim();
+    if (ledType.length() == 0) ledType = "WS2812B";
+    
+    int numLeds;
+    Serial.print("Number of LEDs [30]: ");
+    while (!Serial.available()) delay(100);
+    String numLedsStr = Serial.readStringUntil('\n');
+    numLedsStr.trim();
+    numLeds = (numLedsStr.length() == 0) ? 30 : numLedsStr.toInt();
+    if (numLeds <= 0) numLeds = 30;
+    
+    // Clear existing config and create new one
+    clearAll();
+    JsonDocument doc;
+    JsonArray devices = doc["devices"].to<JsonArray>();
+    JsonObject device1 = devices.add<JsonObject>();
+    device1["device_name"] = deviceName;
+    device1["device_type"] = deviceType;
+    device1["led_type"] = ledType;
+    device1["num_of_leds"] = numLeds;
+    device1["mac_address"] = getDeviceMacAddress();
+    
+    // Add default network
+    JsonArray networks = doc["networks"].to<JsonArray>();
+    JsonObject network1 = networks.add<JsonObject>();
+    network1["ssid"] = "HomeNetwork";
+    network1["password"] = "password123";
+    
+    if (saveData(doc)) {
+        Serial.println("Device configuration saved successfully!");
+        Serial.println("New configuration:");
+        Serial.println(getAllData());
+        return true;
+    } else {
+        Serial.println("Failed to save device configuration!");
+        return false;
+    }
+}
+
+bool PersistentStorage::editNetworkConfig() {
+    Serial.println("\n=== Edit Network Configuration ===");
+    
+    String ssid;
+    Serial.print("WiFi SSID [HomeNetwork]: ");
+    while (!Serial.available()) delay(100);
+    ssid = Serial.readStringUntil('\n');
+    ssid.trim();
+    if (ssid.length() == 0) ssid = "HomeNetwork";
+    
+    String password;
+    Serial.print("WiFi Password [password123]: ");
+    while (!Serial.available()) delay(100);
+    password = Serial.readStringUntil('\n');
+    password.trim();
+    if (password.length() == 0) password = "password123";
+    
+    JsonDocument doc = loadData();
+    JsonArray networks = doc["networks"];
+    
+    // Update first network or create new one
+    if (networks.size() > 0) {
+        networks[0]["ssid"] = ssid;
+        networks[0]["password"] = password;
+    } else {
+        JsonObject newNetwork = networks.add<JsonObject>();
+        newNetwork["ssid"] = ssid;
+        newNetwork["password"] = password;
+    }
+    
+    if (saveData(doc)) {
+        Serial.println("Network configuration saved successfully!");
+        return true;
+    } else {
+        Serial.println("Failed to save network configuration!");
+        return false;
+    }
+}
+
+bool PersistentStorage::clearDataWithConfirmation() {
+    Serial.println("\n=== Clear All Data ===");
+    Serial.println("WARNING: This will erase all device and network configurations!");
+    Serial.print("Type 'YES' to confirm or anything else to cancel: ");
+    
+    while (!Serial.available()) delay(100);
+    String confirmation = Serial.readStringUntil('\n');
+    confirmation.trim();
+    
+    if (confirmation == "YES") {
+        if (clearAll()) {
+            Serial.println("All data cleared successfully!");
+            Serial.println("Reinitializing with default data...");
+            return initializeDefaultData();
+        } else {
+            Serial.println("Failed to clear data!");
+            return false;
+        }
+    } else {
+        Serial.println("Operation cancelled.");
+        return true;
+    }
+}

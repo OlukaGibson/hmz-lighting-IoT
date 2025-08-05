@@ -180,6 +180,8 @@ void handleCommand(String jsonCommand) {
     ESP.restart();
   } else if (command == "blink") {
     handleBlinkCommand(doc);
+  } else if (command == "get_device_info") {
+    sendDeviceInfo();
   } else {
     sendResponse("error", "Unknown command: " + command);
   }
@@ -307,7 +309,7 @@ void handleDeviceInfoReceived(const String& jsonData) {
         return;
     }
     
-    if (doc.containsKey("device_name")) {
+    if (doc["device_name"].is<const char*>()) {
         String deviceName = doc["device_name"];
         String deviceType = doc["device_type"] | "strip";
         String ledType = doc["led_type"] | "WS2812B";
@@ -318,7 +320,7 @@ void handleDeviceInfoReceived(const String& jsonData) {
         // Note: storage.addDevice() will be called when storage is properly linked
     }
     
-    if (doc.containsKey("ssid")) {
+    if (doc["ssid"].is<const char*>()) {
         String ssid = doc["ssid"];
         String password = doc["password"] | "";
         Serial.println("Received network info - would add to storage");
