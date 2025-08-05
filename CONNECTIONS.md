@@ -45,10 +45,10 @@ JSON Commands                 SPIFFS Storage
 
 | Characteristic | UUID | Type | Purpose |
 |----------------|------|------|---------|
-| Device Info TX | `12345678-1234-1234-1234-123456789abd` | READ/NOTIFY | Send device info to phone |
-| Device Info RX | `12345678-1234-1234-1234-123456789abe` | WRITE | Receive device configs from phone |
-| Theme RX | `12345678-1234-1234-1234-123456789abf` | WRITE | Receive LED theme commands |
-| Legacy | `12345678-1234-1234-1234-123456789abd` | READ/WRITE/NOTIFY | Backward compatibility |
+| Device Info TX | `********-****-****-****-************` | READ/NOTIFY | Send device info to phone |
+| Device Info RX | `********-****-****-****-************` | WRITE | Receive device configs from phone |
+| Theme RX | `********-****-****-****-************` | WRITE | Receive LED theme commands |
+| Legacy | `********-****-****-****-************` | READ/WRITE/NOTIFY | Backward compatibility |
 
 ## Data Flow Diagrams
 
