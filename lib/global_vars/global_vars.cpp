@@ -10,4 +10,4 @@ bool oldDeviceConnected = false;
 bool ledState = false;
 unsigned long lastSensorRead = 0;
 float sensorValue = 0.0;
-String deviceName = "ESP32-BLE-Device";
+String deviceName = "HMZ-LED-Controller"; // Default name, will be updated from SPIFFS

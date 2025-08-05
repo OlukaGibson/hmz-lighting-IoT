@@ -285,9 +285,9 @@ String getChipInfo() {
 void sendDeviceInfo() {
     if (!deviceConnected || !pDeviceInfoTxCharacteristic) return;
     
-    // Create a simple device info response
+    // Create a device info response using actual device name and MAC
     JsonDocument doc;
-    doc["device_name"] = deviceName;
+    doc["device_name"] = deviceName; // Use the global deviceName from SPIFFS
     doc["mac_address"] = String((uint32_t)ESP.getEfuseMac(), HEX);
     doc["device_type"] = "controller";
     doc["led_type"] = "WS2812B";

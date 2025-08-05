@@ -493,3 +493,21 @@ bool PersistentStorage::clearDataWithConfirmation() {
         return true;
     }
 }
+
+String PersistentStorage::getFirstDeviceName() {
+    JsonDocument doc = loadData();
+    JsonArray devices = doc["devices"];
+    if (devices.size() > 0) {
+        return devices[0]["device_name"] | "LEDStrip1";
+    }
+    return "LEDStrip1"; // Default fallback
+}
+
+String PersistentStorage::getDeviceName() {
+    JsonDocument doc = loadData();
+    JsonArray devices = doc["devices"];
+    if (devices.size() > 0) {
+        return devices[0]["device_name"] | "HMZ-LED-Controller";
+    }
+    return "HMZ-LED-Controller";
+}

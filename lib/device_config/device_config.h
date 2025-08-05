@@ -20,7 +20,9 @@ public:
     bool editDeviceConfig();
     bool editNetworkConfig();
     bool clearDataWithConfirmation();
+    String getDeviceName();
     String getDeviceMacAddress();
+    String getFirstDeviceName(); // Add this method
     bool addDevice(const String& deviceName, const String& deviceType, 
                    const String& ledType, int numLeds, const String& macAddress);
     bool addNetwork(const String& ssid, const String& password);

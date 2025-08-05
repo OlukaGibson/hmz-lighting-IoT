@@ -39,6 +39,18 @@ void setup() {
     // Show SPIFFS info
     storage.getStorageInfo();
     
+    // Load device name from SPIFFS configuration - get first device
+    JsonDocument configDoc;
+    deserializeJson(configDoc, storage.getAllDataCompact());
+    
+    if (configDoc["devices"].size() > 0) {
+        String configDeviceName = configDoc["devices"][0]["device_name"] | "HMZ-LED-Controller";
+        deviceName = configDeviceName;
+        Serial.println("Loaded device name from SPIFFS: " + deviceName);
+    } else {
+        Serial.println("No devices in config, using default name: " + deviceName);
+    }
+    
     // Interactive setup option
     Serial.println("\nPress 's' within 5 seconds to enter setup mode...");
     unsigned long startTime = millis();
@@ -57,19 +69,26 @@ void setup() {
     
     if (enterSetup) {
         storage.interactiveSetup();
+        // Reload device name after potential changes
+        JsonDocument updatedDoc;
+        deserializeJson(updatedDoc, storage.getAllDataCompact());
+        if (updatedDoc["devices"].size() > 0) {
+            String updatedDeviceName = updatedDoc["devices"][0]["device_name"] | "HMZ-LED-Controller";
+            deviceName = updatedDeviceName;
+            Serial.println("Updated device name: " + deviceName);
+        }
     }
     
     Serial.println("Current configuration:");
     Serial.println(storage.getAllData());
+    Serial.println("Using BLE device name: " + deviceName);
 
     // Initialize LED controller with device config
-    String deviceConfig = storage.getDevice("LEDStrip1");
-    if (deviceConfig != "Device not found") {
-        JsonDocument doc;
-        deserializeJson(doc, deviceConfig);
-        
-        String ledType = doc["led_type"] | "WS2812B";
-        int numLeds = doc["num_of_leds"] | 30;
+    JsonDocument ledDoc;
+    deserializeJson(ledDoc, storage.getAllDataCompact());
+    if (ledDoc["devices"].size() > 0) {
+        String ledType = ledDoc["devices"][0]["led_type"] | "WS2812B";
+        int numLeds = ledDoc["devices"][0]["num_of_leds"] | 30;
         
         ledController.initialize(ledType, numLeds, LED_PIN);
         ledController.setSolidColor(255, 0, 0); // Start with red
@@ -79,10 +98,11 @@ void setup() {
         ledController.setSolidColor(255, 255, 255); // Start with white
     }
 
-    // Initialize BLE
+    // Initialize BLE (now uses the deviceName from SPIFFS)
     ble_setup();
     
     Serial.println("Setup complete! Ready for BLE connections.");
+    Serial.println("BLE Device Name: " + deviceName);
 }
 
 void loop() {
